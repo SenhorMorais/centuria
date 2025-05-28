@@ -1322,7 +1322,7 @@
     <div id="userDashboard" class="dashboard">
         <div class="header">
             <div class="header-content">
-                <h2>Dashboard</h2>
+                <h2>Bem-vindo</h2>
                 <div class="user-info">
                     <span id="userName">Usuário</span>
                     <button class="btn-small" onclick="logout()">Sair</button>
@@ -3922,5 +3922,22 @@
             console.log(`📈 ${investments.length} investimentos disponíveis`);
         });
     </script>
+
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDAljrYJVP5krCy3Uai6LI70rE3Lzm4rps",
+    authDomain: "centuria-v1.firebaseapp.com",
+    projectId: "centuria-v1",
+    storageBucket: "centuria-v1.firebasestorage.app",
+    messagingSenderId: "414206835207",
+    appId: "1:414206835207:web:c9e4e43a27eda8d59788a2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+</script>
+
 </body>
 </html>
