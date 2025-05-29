@@ -3926,6 +3926,7 @@
 <!-- Firebase SDKs -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDAljrYJVP5krCy3Uai6LI70rE3Lzm4rps",
@@ -3933,10 +3934,80 @@
     projectId: "centuria-v1",
     storageBucket: "centuria-v1.firebasestorage.app",
     messagingSenderId: "414206835207",
-    appId: "1:414206835207:web:c9e4e43a27eda8d59788a2"
+    appId: "1:414206835207:web:c9e4e43a27eda8d59788a2",
+    databaseURL: "https://centuria-v1-default-rtdb.firebaseio.com/"
   };
 
   const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Carrega investimentos do Firebase
+  function loadInvestmentsFromFirebase() {
+    const investmentsRef = ref(db, 'investments');
+    onValue(investmentsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        investments = Object.values(snapshot.val());
+        updateUserDashboard();
+      }
+    });
+  }
+
+  // Carrega usuários do Firebase
+  function loadUsersFromFirebase() {
+    const usersRef = ref(db, 'users');
+    onValue(usersRef, (snapshot) => {
+      if (snapshot.exists()) {
+        users = Object.values(snapshot.val());
+        if (currentUser && currentUser.isAdmin) updateAdminDashboard();
+      }
+    });
+  }
+
+  // Carrega transações do Firebase
+  function loadTransactionsFromFirebase() {
+    const transRef = ref(db, 'transactions');
+    onValue(transRef, (snapshot) => {
+      if (snapshot.exists()) {
+        transactions = Object.values(snapshot.val());
+        if (currentUser && !currentUser.isAdmin) updateUserDashboard();
+      }
+    });
+  }
+
+  // Salva novo usuário
+  window.saveUserToFirebase = function(user) {
+    set(ref(db, 'users/' + user.id), user);
+  };
+
+  // Salva nova transação
+  window.saveTransactionToFirebase = function(tx) {
+    set(ref(db, 'transactions/' + tx.id), tx);
+  };
+
+  // Adiciona novo investimento
+  window.addNewInvestment = function () {
+    const id = Date.now();
+    const name = document.getElementById("newInvestmentName").value;
+    const rate = parseFloat(document.getElementById("newInvestmentRate").value);
+    const description = document.getElementById("newInvestmentDescription").value;
+    const minAmount = parseFloat(document.getElementById("newInvestmentMinAmount").value);
+
+    const newInvestment = { id, name, rate, description, minAmount };
+    set(ref(db, 'investments/' + id), newInvestment).then(() => {
+      showSuccess("Investimento adicionado com sucesso!");
+      closeModal("addInvestmentModal");
+    }).catch((error) => {
+      showError("Erro ao adicionar investimento.");
+      console.error(error);
+    });
+  };
+
+  // Carrega dados ao iniciar
+  window.addEventListener("DOMContentLoaded", () => {
+    loadInvestmentsFromFirebase();
+    loadUsersFromFirebase();
+    loadTransactionsFromFirebase();
+  });
 </script>
 
 </body>
